@@ -1,6 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas;
+using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Pdf.Canvas.Parser;
 using pdf_recorte;
 
@@ -8,6 +10,10 @@ public partial class Program
 {
     public static void Main(string[] args)
     {
+
+
+       //LeerPDF("recortados/recorte_resultado_1.pdf");
+        //return ;
         // --- CONFIGURACIÓN ---
         string rutaOrigen = "comprobante.pdf";
         string textoInicio = "Servicio Integral de Tesoreria (SIT)";
@@ -49,31 +55,14 @@ public partial class Program
                     using (PdfWriter writer = new PdfWriter(rutaDestinoIndividual))
                     using (PdfDocument pdfDocDestino = new PdfDocument(writer))
                     {
-                        
-                        pdfDocOrigen.CopyPagesTo(i, i, pdfDocDestino);
-                        PdfPage paginaCopiada = pdfDocDestino.GetPage(1);
+                        // Crear nueva página SOLO del tamaño del bloque
+                        PageSize pageSize = new PageSize(areaRecorte.GetWidth(), areaRecorte.GetHeight());
+                        PdfPage nuevaPagina = pdfDocDestino.AddNewPage(pageSize);
+                        PdfCanvas canvas = new PdfCanvas(nuevaPagina);
 
-                        
-                        var media = paginaCopiada.GetMediaBox();
-
-                        
-                        float left = Math.Max(areaRecorte.GetX(), media.GetX());
-                        float bottom = Math.Max(areaRecorte.GetY(), media.GetY());
-                        float right = Math.Min(areaRecorte.GetX() + areaRecorte.GetWidth(), media.GetX() + media.GetWidth());
-                        float top = Math.Min(areaRecorte.GetY() + areaRecorte.GetHeight(), media.GetY() + media.GetHeight());
-                        if (right <= left || top <= bottom)
-                        {
-                            Console.WriteLine($"Bloque {b + 1} en pág {i} fuera de los límites, se omite.");
-                            continue;
-                        }
-                        Rectangle recorteClampeado = new Rectangle(left, bottom, right - left, top - bottom);
-
-                        
-                        paginaCopiada.SetCropBox(recorteClampeado);
-                        paginaCopiada.SetMediaBox(recorteClampeado);
-                        paginaCopiada.SetBleedBox(recorteClampeado);
-                        paginaCopiada.SetTrimBox(recorteClampeado);
-                        paginaCopiada.SetArtBox(recorteClampeado);
+                        // Dibujar la página original como XObject, desplazando para que solo el bloque quede visible
+                        PdfFormXObject xobj = paginaOrigen.CopyAsFormXObject(pdfDocDestino);
+                        canvas.AddXObjectAt(xobj, -areaRecorte.GetX(), -areaRecorte.GetY());
 
                         Console.WriteLine($"Bloque {b + 1} en pág {i}. Creado '{rutaDestinoIndividual}'.");
                     }
@@ -81,6 +70,22 @@ public partial class Program
             }
         }
         Console.WriteLine("Proceso finalizado.");
+
+    }
+
+
+    public static void LeerPDF(string path){
+
+       using (PdfReader reader = new PdfReader(path))
+       using (PdfDocument pdfDoc = new PdfDocument(reader))
+       {
+           for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+           {
+               PdfPage page = pdfDoc.GetPage(i);
+               string text = PdfTextExtractor.GetTextFromPage(page);
+               Console.WriteLine($"Texto de la página {i}: {text}");
+           }
+       }
 
     }
 }
