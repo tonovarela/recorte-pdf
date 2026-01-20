@@ -1,0 +1,24 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio / VS Code
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# Dotnet artifacts
+*.dll
+*.pdb
+*.cache
+*.log
+
+# Generated PDFs
+recorte_resultado_*.pdf
+
+# Local input files (optional)
+comprobante.pdf
+
+# OS files
+.DS_Store
