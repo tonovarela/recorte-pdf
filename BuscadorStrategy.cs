@@ -15,7 +15,9 @@ public class BuscadorStrategy : LocationTextExtractionStrategy
     public List<Rectangle> Inicios { get; } = new List<Rectangle>();
     public List<Rectangle> Fines { get; } = new List<Rectangle>();
     public List<string> CuentasProveedores { get; } = new List<string>();
-    public List<string> NumerosOperacion { get; } = new List<string>(); // nueva lista
+    public List<string> NumerosOperacion { get; } = new List<string>(); 
+    public List<string> NumerosProveedor { get; } = new List<string>();
+    public List<string> FechasOperacion { get; } = new List<string>();
     public BuscadorStrategy(string textoInicio, string textoFin)
     {
         _inicio = textoInicio;
@@ -40,10 +42,14 @@ public class BuscadorStrategy : LocationTextExtractionStrategy
                 {
                     var rect = renderInfo.GetBaseline().GetBoundingRectangle();
                     Fines.Add(rect);                                                                            
-                    string cuenta_proveedor = ExtraerCuentaProveedor(this._texto);                                        
-                     CuentasProveedores.Add(cuenta_proveedor);                                                        
-                     string numero_operacion = ExtraerNumeroOperacion(this._texto);
-                     NumerosOperacion.Add(numero_operacion);
+                     string cuenta_proveedor = ExtraerCuentaProveedor(this._texto);                                        
+                    CuentasProveedores.Add(cuenta_proveedor);                                                        
+                    string numero_operacion = ExtraerNumeroOperacion(this._texto);
+                    NumerosOperacion.Add(numero_operacion);
+                    string numero_proveedor = ExtraerNumeroProveedor(this._texto);
+                    NumerosProveedor.Add(numero_proveedor);
+                    string fecha_operacion = ExtraerFechaOperacion(this._texto);
+                    FechasOperacion.Add(fecha_operacion);
                     this._texto= string.Empty;
                 }                                        
             }                        
@@ -52,7 +58,7 @@ public class BuscadorStrategy : LocationTextExtractionStrategy
         base.EventOccurred(data, type);
     }
 
-
+ 
 private string ExtraerNumeroOperacion(string texto)
     {
         var match = System.Text.RegularExpressions.Regex.Match(
@@ -65,9 +71,8 @@ private string ExtraerNumeroOperacion(string texto)
         var numero = new string(match.Groups[1].Value.Where(char.IsDigit).ToArray());
         return string.IsNullOrWhiteSpace(numero) ? string.Empty : numero;
     }
-
-
-     private string ExtraerCuentaProveedor(string texto)
+    
+       private string ExtraerCuentaProveedor(string texto)
     {
         var match = System.Text.RegularExpressions.Regex.Match(
             texto,
@@ -78,5 +83,29 @@ private string ExtraerNumeroOperacion(string texto)
 
         var cuenta = new string(match.Groups[1].Value.Where(char.IsDigit).ToArray());
         return string.IsNullOrWhiteSpace(cuenta) ? string.Empty : cuenta;
+    }
+
+
+     private string ExtraerNumeroProveedor(string texto)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(
+            texto,
+            @"(?:Clave\s+del\s+Proveedor|PROVEEDOR)\s*([0-9\s]+)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (!match.Success) return string.Empty;
+        var numero = new string(match.Groups[1].Value.Where(char.IsDigit).ToArray());
+        return string.IsNullOrWhiteSpace(numero) ? string.Empty : numero;
+    }
+
+
+    private string ExtraerFechaOperacion(string texto)
+    {
+     
+        var match = System.Text.RegularExpressions.Regex.Match(
+            texto,
+            @"Fecha\s+de\s+operación\s*([0-9]{2}/[0-9]{2}/[0-9]{4})",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (!match.Success) return string.Empty;
+        return match.Groups[1].Value.Trim();
     }
 }

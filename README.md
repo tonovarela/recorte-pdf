@@ -1,42 +1,39 @@
-# Recorte de PDF por delimitadores (iText 7 C#)
+# Recorte de PDF (iText 7, C#)
 
-Proyecto de consola .NET 8 que:
-- Busca bloques en un PDF desde el texto de inicio "Servicio Integral de Tesoreria (SIT)" hasta el delimitador de guiones bajos.
-- Genera un PDF independiente por cada bloque detectado.
-- Soporta múltiples bloques por página.
+Extrae bloques de comprobantes desde un PDF y genera archivos recortados por cada recibo, identificando:
+- Cuenta del proveedor
+- Número de operación
+- Número de proveedor
+- Fecha de operación
 
 ## Requisitos
-- .NET SDK 8.0
-- iText 7 (referencias ya incluidas en `bin/` por la compilación).
+- .NET 6+ (o compatible)
+- iText 7 (Kernel y extracción de texto)
 
-## Estructura
-- `Program.cs`: Lógica principal. Copia la página al nuevo documento y ajusta MediaBox/CropBox para el recorte.
-- `BuscadorStrategy.cs`: Estrategia de extracción que detecta rectángulos de inicio y fin.
-- `comprobante.pdf`: PDF de entrada (no se versiona por defecto).
-- `recorte_resultado_*.pdf`: PDFs generados (ignorados por git).
+## Estructura clave
+- Program.cs: orquestación, lectura del PDF y generación de recortes.
+- BuscadorStrategy.cs: extracción de texto y parseo con expresiones regulares.
+- DTO/ReciboDTO.cs: datos del recorte y nombre destino.
 
 ## Uso
-1. Coloca `comprobante.pdf` en la raíz del proyecto.
-2. Ajusta los textos si es necesario en `Program.cs`:
-   - `textoInicio = "Servicio Integral de Tesoreria (SIT)"`
-   - `textoFin = "_ _ _ _ _ _ ..."` (cadena de delimitadores)
-3. Ejecuta:
-   - `dotnet build`
-   - `dotnet run`
-4. Revisa los archivos `recorte_resultado_1.pdf`, `recorte_resultado_2.pdf`, etc.
+1. Coloca el PDF de entrada: `comprobante.pdf` en la raíz del proyecto.
+2. Ejecuta:
+   - macOS/Linux:
+     ```bash
+     dotnet run
+     ```
+3. Los archivos recortados se guardan bajo `recortados/` con nombre derivado de los datos de cada recibo.
+
+## Configuración de salida
+- Base de salida: `recortados` (ver `_basePathDestino` en Program.cs).
+- Cada `ReciboDTO` define `pathDestinoIndividual()` para su archivo.
+
+
+
+## .gitignore
+- Se excluyen binarios (`bin/`, `obj/`), artefactos de IDE y PDFs generados (`recortados/*`).
+- `comprobante.pdf` está ignorado por defecto para evitar subir datos sensibles.
 
 ## Notas
-- Coordenadas: iText usa origen en esquina inferior izquierda.
-- Márgenes del recorte: ajusta los valores en `Program.cs` (margenIzq, margenAbajo, margenDer, margenArriba).
-- Si un bloque queda fuera de la `MediaBox`, se omite.
-- Si tu visor muestra en blanco, prueba solo `SetCropBox` (comentando `SetMediaBox`).
-
-## Git
-- `.gitignore` incluye:
-  - `bin/`, `obj/`, artefactos .NET
-  - `recorte_resultado_*.pdf`
-  - `comprobante.pdf` (opcional)
-  - `.DS_Store`
-
-## Licencia
-Este proyecto usa iText Core 9.x (AGPL). Asegúrate de cumplir la licencia de iText para tu caso de uso.
+- Ajusta los patrones regex en `BuscadorStrategy` si el formato del comprobante cambia.
+- Si el PDF no contiene los textos delimitadores, no se generarán recortes para esa página.

@@ -15,8 +15,7 @@ obj/
 *.log
 
 # Generated PDFs
-recorte_resultado_*.pdf
-
+recortados/*
 # Local input files (optional)
 comprobante.pdf
 
