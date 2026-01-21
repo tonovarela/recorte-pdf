@@ -7,19 +7,32 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using pdf_recorte;
 using pdf_recorte.DTO;
 using Path = System.IO.Path;
+using pdf_recorte.conf;
 
 public partial class Program
 {
-
-    static string _basePathDestino = "recortados";
-
-   
+    static string _basePathDestino = String.Empty;
     public static void Main(string[] args)
     {
+        Conf conf = Conf.getInstance();
+        _basePathDestino = conf.BasePathDestino;
         var origen = "comprobante.pdf";
-        List<ReciboDTO> recibos = ObtenerRecibos(origen);
 
-        recibos
+        List<ReciboDTO> recibos = ObtenerRecibos(origen);
+        crearDirectorioSiNoExiste(recibos);
+        
+        using (PdfReader reader = new PdfReader(origen))
+        using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
+            foreach (var r in recibos)
+                RecortarPagina(pdfDocOrigen, r);            
+        
+        
+    }
+
+
+    private static void crearDirectorioSiNoExiste(List<ReciboDTO> recibos)
+    {
+         recibos
         .Select(x => Path.GetDirectoryName(x.pathDestinoIndividual()))
         .Distinct()
         .ToList()
@@ -28,24 +41,9 @@ public partial class Program
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
         });
-        
-                        
-        using (PdfReader reader = new PdfReader(origen))
-        using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
-        {
-            foreach (var r in recibos)
-            {
-                RecortarPagina(pdfDocOrigen, r);
-            }
-        }
-
     }
 
-
-
-
-
-    public static List<ReciboDTO> ObtenerRecibos(string rutaOrigen)
+    private static List<ReciboDTO> ObtenerRecibos(string rutaOrigen)
     {
         List<ReciboDTO> recibos = new List<ReciboDTO>();
         string textoInicio = "Servicio Integral de Tesoreria (SIT)";
@@ -62,7 +60,7 @@ public partial class Program
                 for (int b = 0; b < bloques; b++)
                 {
                     var rectInicio = estrategia.Inicios[b];
-                    var rectFin = estrategia.Fines[b];                    
+                    var rectFin = estrategia.Fines[b];
                     float x = Math.Min(rectInicio.GetX(), rectFin.GetX());
                     float y = Math.Min(rectInicio.GetY(), rectFin.GetY());
                     float maxX = Math.Max(rectInicio.GetX() + rectInicio.GetWidth(), rectFin.GetX() + rectFin.GetWidth());
@@ -73,7 +71,7 @@ public partial class Program
                     Rectangle areaRecorte = new Rectangle(x - margenIzq, y - margenAbajo, width + margenIzq + margenDer, height + margenArriba + margenAbajo);
                     recibos.Add(new ReciboDTO
                     {
-                        BasePathDestino=_basePathDestino,
+                        BasePathDestino = _basePathDestino,
                         NumeroPagina = i,
                         CuentaProveedor = estrategia.CuentasProveedores[b],
                         NumeroOperacion = estrategia.NumerosOperacion[b],
@@ -89,7 +87,7 @@ public partial class Program
     }
 
 
-    public static void RecortarPagina(PdfDocument pdfDocOrigen, ReciboDTO reciboDTO)
+     private static void RecortarPagina(PdfDocument pdfDocOrigen, ReciboDTO reciboDTO)
     {
         string destino = reciboDTO.pathDestinoIndividual();        
         PdfPage paginaOrigen = pdfDocOrigen.GetPage(reciboDTO.NumeroPagina);

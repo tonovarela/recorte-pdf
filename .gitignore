@@ -19,5 +19,6 @@ recortados/*
 # Local input files (optional)
 comprobante.pdf
 
+.env
 # OS files
 .DS_Store
