@@ -9,17 +9,12 @@ using pdf_recorte;
 public partial class Program
 {
     public static void Main(string[] args)
-    {
-
-
-       //LeerPDF("recortados/recorte_resultado_1.pdf");
-        //return ;
+    {       
         // --- CONFIGURACIÓN ---
         string rutaOrigen = "comprobante.pdf";
         string textoInicio = "Servicio Integral de Tesoreria (SIT)";
         string textoFin = "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _";
-        // --- PROCESO ---
-        int contadorArchivos = 0;
+        // --- PROCESO ---        
         using (PdfReader reader = new PdfReader(rutaOrigen))
         using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
         {
@@ -32,7 +27,9 @@ public partial class Program
                 for (int b = 0; b < bloques; b++)
                 {
                     var rectInicio = estrategia.Inicios[b];
-                    var rectFin = estrategia.Fines[b];                
+                    var rectFin = estrategia.Fines[b]; 
+                    string cuentaProveedor = estrategia.CuentasProveedores[b];            
+                    string numeroOperacion = estrategia.NumerosOperacion[b];   
                     float x = Math.Min(rectInicio.GetX(), rectFin.GetX());
                     float y = Math.Min(rectInicio.GetY(), rectFin.GetY());
                     float maxX = Math.Max(rectInicio.GetX() + rectInicio.GetWidth(), rectFin.GetX() + rectFin.GetWidth());
@@ -47,25 +44,23 @@ public partial class Program
                         y - margenAbajo,
                         width + margenIzq + margenDer,
                         height + margenArriba + margenAbajo
-                    );
+                    );                    
+                    string rutaDestinoIndividual = $"recortados/cuenta_{cuentaProveedor}_{numeroOperacion}.pdf";
+                    Console.WriteLine(rutaDestinoIndividual);
+                    // using (PdfWriter writer = new PdfWriter(rutaDestinoIndividual))
+                    // using (PdfDocument pdfDocDestino = new PdfDocument(writer))
+                    // {
+                    //     // Crear nueva página SOLO del tamaño del bloque
+                    //     PageSize pageSize = new PageSize(areaRecorte.GetWidth(), areaRecorte.GetHeight());
+                    //     PdfPage nuevaPagina = pdfDocDestino.AddNewPage(pageSize);
+                    //     PdfCanvas canvas = new PdfCanvas(nuevaPagina);
 
-                    contadorArchivos++;
-                    string rutaDestinoIndividual = $"recorte_resultado_{contadorArchivos}.pdf";
+                    //     // Dibujar la página original como XObject, desplazando para que solo el bloque quede visible
+                    //     PdfFormXObject xobj = paginaOrigen.CopyAsFormXObject(pdfDocDestino);
+                    //     canvas.AddXObjectAt(xobj, -areaRecorte.GetX(), -areaRecorte.GetY());
 
-                    using (PdfWriter writer = new PdfWriter(rutaDestinoIndividual))
-                    using (PdfDocument pdfDocDestino = new PdfDocument(writer))
-                    {
-                        // Crear nueva página SOLO del tamaño del bloque
-                        PageSize pageSize = new PageSize(areaRecorte.GetWidth(), areaRecorte.GetHeight());
-                        PdfPage nuevaPagina = pdfDocDestino.AddNewPage(pageSize);
-                        PdfCanvas canvas = new PdfCanvas(nuevaPagina);
-
-                        // Dibujar la página original como XObject, desplazando para que solo el bloque quede visible
-                        PdfFormXObject xobj = paginaOrigen.CopyAsFormXObject(pdfDocDestino);
-                        canvas.AddXObjectAt(xobj, -areaRecorte.GetX(), -areaRecorte.GetY());
-
-                        Console.WriteLine($"Bloque {b + 1} en pág {i}. Creado '{rutaDestinoIndividual}'.");
-                    }
+                    //     Console.WriteLine($"Bloque {b + 1} en pág {i}. Creado '{rutaDestinoIndividual}'.");
+                    // }
                 }
             }
         }
