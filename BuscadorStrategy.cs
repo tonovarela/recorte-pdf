@@ -10,8 +10,6 @@ public class BuscadorStrategy : LocationTextExtractionStrategy
     private readonly string _fin;
     private  string _texto = string.Empty;
     
-    
-
     public List<Rectangle> Inicios { get; } = new List<Rectangle>();
     public List<Rectangle> Fines { get; } = new List<Rectangle>();
     public List<string> CuentasProveedores { get; } = new List<string>();
