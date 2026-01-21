@@ -1,5 +1,3 @@
-using System;
-
 namespace pdf_recorte.conf;
 using DotNetEnv;
 public class Conf

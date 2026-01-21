@@ -1,5 +1,4 @@
-﻿
-using iText.Kernel.Geom;
+﻿using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Xobject;
@@ -19,14 +18,12 @@ public partial class Program
         var origen = "comprobante.pdf";
 
         List<ReciboDTO> recibos = ObtenerRecibos(origen);
-        crearDirectorioSiNoExiste(recibos);
-        
+        crearDirectorioSiNoExiste(recibos);        
         using (PdfReader reader = new PdfReader(origen))
         using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
             foreach (var r in recibos)
                 RecortarPagina(pdfDocOrigen, r);            
-        
-        
+                
     }
 
 
