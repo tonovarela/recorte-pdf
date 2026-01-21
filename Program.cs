@@ -62,12 +62,7 @@ public partial class Program
                 for (int b = 0; b < bloques; b++)
                 {
                     var rectInicio = estrategia.Inicios[b];
-                    var rectFin = estrategia.Fines[b];
-                    string cuentaProveedor = estrategia.CuentasProveedores[b];
-                    string numeroOperacion = estrategia.NumerosOperacion[b];
-                    string numeroProveedor = estrategia.NumerosProveedor[b];
-                    string fechaOperacion = estrategia.FechasOperacion[b];
-
+                    var rectFin = estrategia.Fines[b];                    
                     float x = Math.Min(rectInicio.GetX(), rectFin.GetX());
                     float y = Math.Min(rectInicio.GetY(), rectFin.GetY());
                     float maxX = Math.Max(rectInicio.GetX() + rectInicio.GetWidth(), rectFin.GetX() + rectFin.GetWidth());
@@ -80,11 +75,11 @@ public partial class Program
                     {
                         BasePathDestino=_basePathDestino,
                         NumeroPagina = i,
-                        CuentaProveedor = cuentaProveedor,
-                        NumeroOperacion = numeroOperacion,
-                        NumeroProveedor = numeroProveedor,
+                        CuentaProveedor = estrategia.CuentasProveedores[b],
+                        NumeroOperacion = estrategia.NumerosOperacion[b],
+                        NumeroProveedor = estrategia.NumerosProveedor[b],
                         AreaRecorte = areaRecorte,
-                        FechaOperacion = fechaOperacion,
+                        FechaOperacion = estrategia.FechasOperacion[b],
                     });
                 }
             }
