@@ -7,6 +7,7 @@ using pdf_recorte;
 using pdf_recorte.DTO;
 using Path = System.IO.Path;
 using pdf_recorte.conf;
+using pdf_recorte.Stategy;
 
 public partial class Program
 {
@@ -64,7 +65,7 @@ public partial class Program
                     float maxY = Math.Max(rectInicio.GetY() + rectInicio.GetHeight(), rectFin.GetY() + rectFin.GetHeight());
                     float width = maxX - x;
                     float height = maxY - y;
-                    float margenIzq = 10f, margenAbajo = 10f, margenDer = 10f, margenArriba = 10f;
+                    float margenIzq = 10f, margenAbajo = 2f, margenDer = 10f, margenArriba = 20f;
                     Rectangle areaRecorte = new Rectangle(x - margenIzq, y - margenAbajo, width + margenIzq + margenDer, height + margenArriba + margenAbajo);
                     recibos.Add(new ReciboDTO
                     {

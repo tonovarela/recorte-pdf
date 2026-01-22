@@ -2,7 +2,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf.Canvas.Parser.Data;
-namespace pdf_recorte;
+namespace pdf_recorte.Stategy;
 
 public class BuscadorStrategy : LocationTextExtractionStrategy
 {
@@ -40,7 +40,7 @@ public class BuscadorStrategy : LocationTextExtractionStrategy
                 {
                     var rect = renderInfo.GetBaseline().GetBoundingRectangle();
                     Fines.Add(rect);                                                                            
-                     string cuenta_proveedor = ExtraerCuentaProveedor(this._texto);                                        
+                    string cuenta_proveedor = ExtraerCuentaProveedor(this._texto);                                        
                     CuentasProveedores.Add(cuenta_proveedor);                                                        
                     string numero_operacion = ExtraerNumeroOperacion(this._texto);
                     NumerosOperacion.Add(numero_operacion);
