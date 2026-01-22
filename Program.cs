@@ -3,7 +3,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Pdf.Canvas.Parser;
-using pdf_recorte;
+
 using pdf_recorte.DTO;
 using Path = System.IO.Path;
 using pdf_recorte.conf;
@@ -17,14 +17,12 @@ public partial class Program
         Conf conf = Conf.getInstance();
         _basePathDestino = conf.BasePathDestino;
         var origen = "comprobante.pdf";
-
         List<ReciboDTO> recibos = ObtenerRecibos(origen);
         crearDirectorioSiNoExiste(recibos);        
         using (PdfReader reader = new PdfReader(origen))
         using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
             foreach (var r in recibos)
-                RecortarPagina(pdfDocOrigen, r);            
-                
+                RecortarPagina(pdfDocOrigen, r);                            
     }
 
 
