@@ -7,7 +7,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using pdf_recorte.DTO;
 using Path = System.IO.Path;
 using pdf_recorte.conf;
-using pdf_recorte.stategy;
+using pdf_recorte.strategy;
 
 public partial class Program
 {
