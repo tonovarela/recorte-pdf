@@ -7,7 +7,7 @@ using pdf_recorte;
 using pdf_recorte.DTO;
 using Path = System.IO.Path;
 using pdf_recorte.conf;
-using pdf_recorte.Stategy;
+using pdf_recorte.stategy;
 
 public partial class Program
 {

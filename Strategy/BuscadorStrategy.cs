@@ -2,7 +2,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf.Canvas.Parser.Data;
-namespace pdf_recorte.Stategy;
+namespace pdf_recorte.stategy;
 
 public class BuscadorStrategy : LocationTextExtractionStrategy
 {
