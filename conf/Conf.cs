@@ -9,7 +9,7 @@ public class Conf
     public string HotFolderPath { get; set; }
     private  static Conf? _instance ;
 
-    public string BasePathDestino { get; set; } = "recortados";
+    public string BasePathDestino { get; set; } 
 
     private Conf()
     {
@@ -18,7 +18,9 @@ public class Conf
         bool isDevelopment = Environment.Equals("development", StringComparison.OrdinalIgnoreCase);        
         Console.WriteLine($"Entorno: {(isDevelopment ? "Desarrollo" : "Producción")}");
         ConnectionString = Env.GetString("SQL_CONNECTION_STRING") ?? throw new InvalidOperationException("La variable de entorno 'SQL_CONNECTION_STRING' no está definida.");
-        HotFolderPath = Env.GetString($"HOT_FOLDER_PATH_{(isDevelopment ? "DEV" : "PROD")}") ?? throw new InvalidOperationException("La variable de entorno 'HOT_FOLDER_PATH' no está definida."); 
+        
+        HotFolderPath = Env.GetString($"HOT_FOLDER_PATH_{(isDevelopment ? "DEV" : "PROD")}") ?? throw new InvalidOperationException("La variable de entorno 'HOT_FOLDER_PATH' no está definida.");         
+        BasePathDestino = Env.GetString($"PATH_DESTINO_{(isDevelopment ? "DEV" : "PROD")}") ?? throw new InvalidOperationException("La variable de entorno 'PATH_DESTINO' no está definida.");
     }
 
     public static Conf getInstance()

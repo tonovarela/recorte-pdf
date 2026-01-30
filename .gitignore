@@ -8,6 +8,8 @@ obj/
 *.suo
 *.userprefs
 
+*.pdf
+
 # Dotnet artifacts
 *.dll
 *.pdb
