@@ -27,30 +27,13 @@ public partial class Program
         var archivosEntrada = obtenerArchivosEntrada();
         foreach (var origen in archivosEntrada)
         {
-            List<ReciboDTO> recibos = ObtenerRecibos(origen);
+            List<ReciboDTO> recibos = ObtenerRecibos(origen);            
+             crearDirectorioSiNoExiste(recibos);        
+                using (PdfReader reader = new PdfReader(origen.Ruta))
+                using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
+                    foreach (var r in recibos)
+                        RecortarPagina(pdfDocOrigen, r);                                    
             
-            if (origen.Tipo == TipoArchivo.PLATAFORMA)
-            {                                      
-                //  crearDirectorioSiNoExiste(recibos);        
-                // using (PdfReader reader = new PdfReader(origen.Ruta))
-                // using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
-                //     foreach (var r in recibos)
-                //         RecortarPagina(pdfDocOrigen, r);                                    
-            }
-            if  (origen.Tipo == TipoArchivo.CASH)
-            {      
-
-                foreach (var r in recibos)
-                {
-                    Console.WriteLine(r);
-                }          
-                // crearDirectorioSiNoExiste(recibos);        
-                // using (PdfReader reader = new PdfReader(origen.Ruta))
-                // using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
-                //     foreach (var r in recibos)
-                //         RecortarPagina(pdfDocOrigen, r);                                    
-
-            }
                            
         }
     }
