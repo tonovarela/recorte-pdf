@@ -13,6 +13,11 @@
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="itext" Version="9.5.0" />
     <PackageReference Include="itext.bouncy-castle-adapter" Version="9.5.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DAO/" />
   </ItemGroup>
 
 </Project>

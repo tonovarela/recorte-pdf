@@ -10,6 +10,7 @@ using pdf_recorte.DTO;
 using Path = System.IO.Path;
 using pdf_recorte.conf;
 using pdf_recorte.strategy;
+using pdf_recorte.DAO;
 
 
 public partial class Program
@@ -23,16 +24,30 @@ public partial class Program
         Conf conf = Conf.getInstance();
         _basePathDestino = conf.BasePathDestino;
         _hotFolderPath = conf.HotFolderPath;
+        OrdenDAO ordenDAO = new OrdenDAO();
+        //
 
-        var archivosEntrada = obtenerArchivosEntrada();
+
+
+
+         var archivosEntrada = obtenerArchivosEntrada();
+         
         foreach (var origen in archivosEntrada)
         {
-            List<ReciboDTO> recibos = ObtenerRecibos(origen);            
-             crearDirectorioSiNoExiste(recibos);        
-                using (PdfReader reader = new PdfReader(origen.Ruta))
-                using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
-                    foreach (var r in recibos)
-                        RecortarPagina(pdfDocOrigen, r);                                    
+            //Console.WriteLine($"Archivo: {origen.Ruta}, Tipo: {origen.Tipo}");
+
+             List<ReciboDTO> recibos = ObtenerRecibos(origen);            
+             foreach(var r in recibos.Where(r=>r.NumeroProveedor!="TEST"))
+             {
+                Console.WriteLine($"Número de Operación: {r.NumeroOperacion}, Número de Proveedor: {r.NumeroProveedor}, Fecha de Operación: {r.FechaOperacion}");
+                //TODO: Queda pendiente obtener el monto desde el PDF para pasarlo al método obtenerDatos, por ahora se está usando un monto fijo para pruebas
+                //ordenDAO.obtenerDatos(274071.17, r.NumeroProveedor, r.FechaOperacion);
+             }
+            //  crearDirectorioSiNoExiste(recibos);        
+            //     using (PdfReader reader = new PdfReader(origen.Ruta))
+            //     using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
+            //         foreach (var r in recibos)
+            //             RecortarPagina(pdfDocOrigen, r);                                    
             
                            
         }
