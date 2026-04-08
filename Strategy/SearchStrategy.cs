@@ -19,6 +19,7 @@ public class SearchStrategy:LocationTextExtractionStrategy
     public List<string> NumerosOperacion { get; } = new List<string>(); 
     public List<string> NumerosProveedor { get; } = new List<string>();
     public List<string> FechasOperacion { get; } = new List<string>();
+    public List<string> Montos { get; } = new List<string>();
 
 
  public SearchStrategy(string textoInicio, string textoFin)
@@ -50,8 +51,11 @@ public override void EventOccurred(IEventData data, EventType type)
                     string numero_proveedor = ExtraerNumeroProveedor(this._texto);
                     NumerosProveedor.Add(numero_proveedor);
                     string fecha_operacion = ExtraerFechaOperacion(this._texto);
-                    FechasOperacion.Add(fecha_operacion);
+                    FechasOperacion.Add(fecha_operacion);                    
+                    string monto = ExtraerMonto(this._texto);
+                    Montos.Add(monto);
                     this._texto= string.Empty;
+                    
                 }                                        
             }                        
         }
@@ -71,6 +75,19 @@ public override void EventOccurred(IEventData data, EventType type)
     protected virtual string ExtraerNumeroProveedor(string texto)
     {
         return "TEST";
+    }
+
+    protected virtual string ExtraerMonto(string texto)
+    {        
+        var match = System.Text.RegularExpressions.Regex.Match(
+            texto,
+            @"Importe del pago\s*([0-9,]+\.?[0-9]*)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        if (!match.Success) return string.Empty;
+
+        var numero = match.Groups[1].Value.Replace(",", "").Trim();
+        return string.IsNullOrWhiteSpace(numero) ? string.Empty : numero;
     }
     
     protected virtual string ExtraerNumeroOperacion(string texto)

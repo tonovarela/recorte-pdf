@@ -5,51 +5,49 @@ using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Pdf.Canvas.Parser;
 
 
-using pdf_recorte.DTO;
 
+using pdf_recorte.DTO;
 using Path = System.IO.Path;
 using pdf_recorte.conf;
 using pdf_recorte.strategy;
 using pdf_recorte.DAO;
 
 
+
 public partial class Program
 {
-
-
-    static string _basePathDestino = String.Empty;
     static string _hotFolderPath = String.Empty;
     public static void Main(string[] args)
-    {
+    {       
         Conf conf = Conf.getInstance();
-        _basePathDestino = conf.BasePathDestino;
-        _hotFolderPath = conf.HotFolderPath;
-        OrdenDAO ordenDAO = new OrdenDAO();
-        //
-
-
-
-
-         var archivosEntrada = obtenerArchivosEntrada();
-         
+        AnexoDAO anexoDAO = new AnexoDAO();        
+        
+        _hotFolderPath = conf.HotFolderPath;        
+        var archivosEntrada = obtenerArchivosEntrada();         
         foreach (var origen in archivosEntrada)
-        {
-            //Console.WriteLine($"Archivo: {origen.Ruta}, Tipo: {origen.Tipo}");
+        {            
+             List<ReciboDTO> recibos = ObtenerRecibos(origen)
+                    .Where(r => r.NumeroProveedor != "TEST")
+                    .Select(r => {
+                        r.ArchivoAnexoDTO = anexoDAO.obtener(r.Monto, r.NumeroProveedor, r.FechaOperacion);                        
+                        return r;
+                    })
+                    .Where(r => r.ArchivoAnexoDTO is not null)
+                    .ToList();
 
-             List<ReciboDTO> recibos = ObtenerRecibos(origen);            
-             foreach(var r in recibos.Where(r=>r.NumeroProveedor!="TEST"))
-             {
-                Console.WriteLine($"Número de Operación: {r.NumeroOperacion}, Número de Proveedor: {r.NumeroProveedor}, Fecha de Operación: {r.FechaOperacion}");
-                //TODO: Queda pendiente obtener el monto desde el PDF para pasarlo al método obtenerDatos, por ahora se está usando un monto fijo para pruebas
-                //ordenDAO.obtenerDatos(274071.17, r.NumeroProveedor, r.FechaOperacion);
-             }
-            //  crearDirectorioSiNoExiste(recibos);        
-            //     using (PdfReader reader = new PdfReader(origen.Ruta))
-            //     using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
-            //         foreach (var r in recibos)
-            //             RecortarPagina(pdfDocOrigen, r);                                    
-            
-                           
+                crearDirectorioSiNoExiste(recibos);        
+                                                        
+                using (PdfReader reader = new PdfReader(origen.Ruta))
+                using (PdfDocument pdfDocOrigen = new PdfDocument(reader))
+                    foreach (var r in recibos){                        
+                        if (anexoDAO.existe(r.ArchivoAnexoDTO!)){                            
+                            anexoDAO.borrar(r.ArchivoAnexoDTO!.Id.ToString());
+                        }                            
+                        RecortarPagina(pdfDocOrigen, r); 
+                        Console.WriteLine($"Archivo generado: {r.ArchivoAnexoDTO!.RutaArchivoSystem}");                                   
+                        anexoDAO.registrar(r.ArchivoAnexoDTO!);
+                    }
+                                                               
         }
     }
 
@@ -85,14 +83,16 @@ public partial class Program
 
     private static void crearDirectorioSiNoExiste(List<ReciboDTO> recibos)
     {
-        recibos
-       .Select(x => Path.GetDirectoryName(x.pathDestinoIndividual()))
+        recibos       
+       .Select(x => Path.GetDirectoryName(x.ArchivoAnexoDTO!.RutaArchivoSystem))
        .Distinct()
        .ToList()
        .ForEach(dir =>
-       {
-           if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-               Directory.CreateDirectory(dir);
+       {    
+           if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)){               
+              Directory.CreateDirectory(dir);
+           }
+               
        });
     }
 
@@ -159,13 +159,13 @@ public partial class Program
                     float margenIzq = 10f, margenAbajo = 2f, margenDer = 10f, margenArriba = archivo.Tipo == TipoArchivo.CASH ? 30f : 20f;
                     Rectangle areaRecorte = new Rectangle(x - margenIzq, y - margenAbajo, width + margenIzq + margenDer, height + margenArriba + margenAbajo);
                     recibos.Add(new ReciboDTO
-                    {
-                        BasePathDestino = _basePathDestino,
+                    {                        
                         NumeroPagina = i,                        
                         NumeroOperacion = estrategia.NumerosOperacion[b],
                         NumeroProveedor = estrategia.NumerosProveedor[b],
                         AreaRecorte = areaRecorte,
                         FechaOperacion = estrategia.FechasOperacion[b],
+                        Monto =  estrategia.Montos[b]
                     });
                 }
             }
@@ -175,7 +175,7 @@ public partial class Program
 
     private static void RecortarPagina(PdfDocument pdfDocOrigen, ReciboDTO reciboDTO)
     {
-        string destino = reciboDTO.pathDestinoIndividual();
+        string destino = reciboDTO.ArchivoAnexoDTO!.RutaArchivoSystem;
         PdfPage paginaOrigen = pdfDocOrigen.GetPage(reciboDTO.NumeroPagina);
         using (PdfWriter writer = new PdfWriter(destino))
         using (PdfDocument pdfDocDestino = new PdfDocument(writer))
