@@ -1,94 +1,18 @@
 using System;
 
-namespace pdf_recorte.DAO;
+namespace pdf_recorte.DAO.implementation;
 
 using Microsoft.Data.SqlClient;
+using pdf_recorte.conf;
+using pdf_recorte.DAO.interfaces;
 using pdf_recorte.DTO;
 
-public class AnexoDAO : DAO
+public class AnexoDAO :  IAnexoDAO
 {
 
-
-    public ArchivoAnexoDTO? obtener(string monto, string contacto, string fechaEmision)
-    {
-       ArchivoAnexoDTO? anexo = null;
-        try
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                string query = $@"Select 
-                                       'DIN', 
-                                        ID,
-                                        IDR='?', 
-                                        Nombre='CP-Cheque Electronico-'+ MovID+'.pdf',
-                                        Direccion=Ltrim(Rtrim('\\192.168.2.217\intelisis\CFD\ContabilidadElectronica\XML_PROV\LITO\COMPROBANTES_PAGO\'
-                                                    +Ltrim(Rtrim(convert(char, year(FechaEmision))))+'\'+Ltrim(Rtrim(Convert(char,Month(FechaEmision))))+'\'+
-                                                    +Ltrim(Rtrim(Convert(Char,Contacto)))+'\'+'CP-Cheque Electronico-'+ MovID+'.pdf')),
-                                        Icono=66, 
-                                        Tipo='Archivo', 
-                                        Orden=1,
-                                        Sucursal=0, 
-                                        FechaEmision,
-                                        TipoDocumento='CP',
-                                        Alta=FechaEmision, 
-                                        UltimoCambio=FechaEmision,
-                                        Usuario='SCORREA'
-                                        --FechaEmision, Importe, Moneda, Contacto  DATOS QUE VIENEN EN EL COMPROBANTE
-                                        From Lito.dbo.Dinero
-                                        Where  1=1
-                                        and Mov='Cheque Electronico' 
-                                        and Estatus in ('Concluido', 'Conciliado') 
-                                        and Moneda in ('Pesos', 'Dolares')
-                                        and FechaEmision= @fechaEmision
-                                        and Importe= @monto
-                                        and Contacto = @contacto"
-                                        ;
-
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {                    
-                    command.Parameters.AddWithValue("@fechaEmision", fechaEmision);
-                    command.Parameters.AddWithValue("@monto", monto);
-                    command.Parameters.AddWithValue("@contacto", contacto);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string? id = reader["ID"].ToString();
-                            string? nombre = reader["Nombre"].ToString();
-                            string? direccion = reader["Direccion"].ToString();
-                            string? tipo = reader["TipoDocumento"].ToString();                            
-                            if (id != null && nombre != null && direccion != null && tipo != null)
-                            {                            
-                                anexo = new ArchivoAnexoDTO
-                                {
-                                    Id = int.Parse(id),
-                                    NombreArchivo = nombre,
-                                    RutaArchivoSystem = direccion,
-                                    RutaArchivoDB = direccion,
-                                    Tipo = tipo!
-                                };
-                            }                            
-                            if (reader.Read())
-                            {
-                                Console.WriteLine("Se encontró más de una fila, se devuelve null");
-                                anexo = null;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al obtener datos: {ex.Message}");
-        }
-        return anexo;
-
-    }
-
-
-
+private readonly string connectionString;
+    public AnexoDAO(Conf conf)=> connectionString =conf.ConnectionString;
+             
     public void  borrar(string id){
         try
         {
@@ -141,9 +65,9 @@ public class AnexoDAO : DAO
             {                
                 connection.Open();
                 string query = @"begin											                                    
-				insert into Lito_jess.dbo.anexomov (Rama,Nombre,ID,Direccion,Icono,Tipo,Orden,Comentario,FechaEmision,TipoDocumento)
-				            values(@rama,@nombreArchivo,@id,@path,66,'Archivo',1,'SCORREA',GETDATE(),@tipo);
-		     	end	";
+    			insert into Lito_jess.dbo.anexomov (Rama,Nombre,ID,Direccion,Icono,Tipo,Orden,Comentario,FechaEmision,TipoDocumento)
+    			            values(@rama,@nombreArchivo,@id,@path,66,'Archivo',1,'SCORREA',GETDATE(),@tipo);
+    	     	end	";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -161,5 +85,86 @@ public class AnexoDAO : DAO
             Console.WriteLine($"Error al registrar archivo anexo: {ex.Message}");
         }
     }
+  
+  
+   
 
+    public ArchivoAnexoDTO? obtener(string monto, string numeroProveedor, string fechaOperacion)
+    {
+             ArchivoAnexoDTO? anexo = null;
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = $@"Select 
+                                       'DIN', 
+                                        ID,
+                                        IDR='?', 
+                                        Nombre='CP-Cheque Electronico-'+ MovID+'.pdf',
+                                        Direccion=Ltrim(Rtrim('\\192.168.2.217\intelisis\CFD\ContabilidadElectronica\XML_PROV\LITO\COMPROBANTES_PAGO\'
+                                                    +Ltrim(Rtrim(convert(char, year(FechaEmision))))+'\'+Ltrim(Rtrim(Convert(char,Month(FechaEmision))))+'\'+
+                                                    +Ltrim(Rtrim(Convert(Char,Contacto)))+'\'+'CP-Cheque Electronico-'+ MovID+'.pdf')),
+                                        Icono=66, 
+                                        Tipo='Archivo', 
+                                        Orden=1,
+                                        Sucursal=0, 
+                                        FechaEmision,
+                                        TipoDocumento='CP',
+                                        Alta=FechaEmision, 
+                                        UltimoCambio=FechaEmision,
+                                        Usuario='SCORREA'
+                                        --FechaEmision, Importe, Moneda, Contacto  DATOS QUE VIENEN EN EL COMPROBANTE
+                                        From Lito.dbo.Dinero
+                                        Where  1=1
+                                        and Mov='Cheque Electronico' 
+                                        and Estatus in ('Concluido', 'Conciliado') 
+                                        and Moneda in ('Pesos', 'Dolares')
+                                        and FechaEmision= @fechaEmision
+                                        and Importe= @monto
+                                        and Contacto = @contacto"
+                                        ;
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {                    
+                    command.Parameters.AddWithValue("@fechaEmision", fechaOperacion);
+                    command.Parameters.AddWithValue("@monto", monto);
+                    command.Parameters.AddWithValue("@contacto", numeroProveedor);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string? id = reader["ID"].ToString();
+                            string? nombre = reader["Nombre"].ToString();
+                            string? direccion = reader["Direccion"].ToString();
+                            string? tipo = reader["TipoDocumento"].ToString();                            
+                            if (id != null && nombre != null && direccion != null && tipo != null)
+                            {                            
+                                anexo = new ArchivoAnexoDTO
+                                {
+                                    Id = int.Parse(id),
+                                    NombreArchivo = nombre,
+                                    RutaArchivoSystem = direccion,
+                                    RutaArchivoDB = direccion,
+                                    Tipo = tipo!
+                                };
+                            }                            
+                            if (reader.Read())
+                            {
+                                Console.WriteLine("Se encontró más de una fila, se devuelve null");
+                                anexo = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener datos: {ex.Message}");
+        }
+        return anexo;
+    }
+
+    
 }

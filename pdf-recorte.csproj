@@ -14,9 +14,14 @@
     <PackageReference Include="itext" Version="9.5.0" />
     <PackageReference Include="itext.bouncy-castle-adapter" Version="9.5.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DAO/interfaces/" />
+    <Folder Include="services/" />
+    <Folder Include="services/implementation/" />
+    <Folder Include="services/interfaces/" />
     <Folder Include="utils/" />
   </ItemGroup>
 

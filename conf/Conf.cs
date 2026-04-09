@@ -1,14 +1,12 @@
 namespace pdf_recorte.conf;
 using DotNetEnv;
 public class Conf
-{
-    private static readonly object _lock = new();
+{    
     public string Environment { get; set; } 
     public string ConnectionString { get; set; }
     public string HotFolderPath { get; set; }
-    private  static Conf? _instance ;
-
-    private Conf()
+    
+    public Conf()
     {
         Env.Load();
         Environment = Env.GetString("ENVIRONMENT") ?? throw new InvalidOperationException("La variable de entorno 'ENVIRONMENT' no está definida.");
@@ -18,18 +16,5 @@ public class Conf
         HotFolderPath = Env.GetString($"HOT_FOLDER_PATH_{(isDevelopment ? "DEV" : "PROD")}") ?? throw new InvalidOperationException("La variable de entorno 'HOT_FOLDER_PATH' no está definida.");             
     }
 
-    public static Conf getInstance()
-    {
-        if (_instance == null)
-        {
-            lock (_lock)
-            {
-                if (_instance == null)
-                {
-                    _instance = new Conf();
-                }
-            }
-        }
-        return _instance;
-    }
+    
 }

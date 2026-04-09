@@ -22,6 +22,19 @@ public class ArchivoManager
             .ToList()!;
     }
 
+    public static void Eliminar(string ruta)
+    {
+        try
+        {
+            File.Delete(ruta);
+            Console.WriteLine($"Archivo eliminado: {ruta}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error al eliminar {ruta}: {ex.Message}");
+        }
+    }
+
       private static TipoArchivo? DetectarTipoArchivo(string rutaPdf)
     {
         try
