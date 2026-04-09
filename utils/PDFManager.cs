@@ -4,6 +4,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Xobject;
+using Microsoft.Extensions.DependencyModel.Resolution;
 using pdf_recorte.conf;
 using pdf_recorte.DTO;
 using pdf_recorte.strategy;
@@ -30,7 +31,7 @@ public class PDFManager
             PdfPage paginaOrigen = pdfDocOrigen.GetPage(i);
 
             var estrategia = config.CrearEstrategia(config.TextoInicio, config.TextoFin);
-    
+
             PdfTextExtractor.GetTextFromPage(paginaOrigen, estrategia);
 
             int bloques = Math.Min(estrategia.Inicios.Count, estrategia.Fines.Count);
@@ -55,7 +56,7 @@ public class PDFManager
     }
 
 
- private static Rectangle CalcularAreaRecorte(Rectangle rectInicio, Rectangle rectFin, float margenArriba)
+    private static Rectangle CalcularAreaRecorte(Rectangle rectInicio, Rectangle rectFin, float margenArriba)
     {
         const float margenIzq = 10f, margenAbajo = 2f, margenDer = 10f;
 
@@ -73,7 +74,7 @@ public class PDFManager
     }
 
 
-      public static void RecortarPagina(PdfDocument pdfDocOrigen, ReciboDTO reciboDTO)
+    public static void RecortarPagina(PdfDocument pdfDocOrigen, ReciboDTO reciboDTO)
     {
         string destino = reciboDTO.ArchivoAnexoDTO!.RutaArchivoSystem;
         PdfPage paginaOrigen = pdfDocOrigen.GetPage(reciboDTO.NumeroPagina);
@@ -81,31 +82,43 @@ public class PDFManager
 
         using var writer = new PdfWriter(destino);
         using var pdfDocDestino = new PdfDocument(writer);
+                var pageSize = new PageSize(areaRecorte.GetWidth(), areaRecorte.GetHeight());
+                PdfPage nuevaPagina = pdfDocDestino.AddNewPage(pageSize);
 
-        var pageSize = new PageSize(areaRecorte.GetWidth(), areaRecorte.GetHeight());
-        PdfPage nuevaPagina = pdfDocDestino.AddNewPage(pageSize);
-
-        var canvas = new PdfCanvas(nuevaPagina);
-        PdfFormXObject xobj = paginaOrigen.CopyAsFormXObject(pdfDocDestino);
-        canvas.AddXObjectAt(xobj, -areaRecorte.GetX(), -areaRecorte.GetY());
+                var canvas = new PdfCanvas(nuevaPagina);
+                PdfFormXObject xobj = paginaOrigen.CopyAsFormXObject(pdfDocDestino);
+                canvas.AddXObjectAt(xobj, -areaRecorte.GetX(), -areaRecorte.GetY());
     }
 
 
-    public static void CrearDirectoriosSiNoExisten(List<string> rutasArchivos)
+    public static bool CrearDirectoriosSiNoExisten(List<string> rutasArchivos)
     {
 
-         var directorios = rutasArchivos
-            .Select(ruta => System.IO.Path.GetDirectoryName(ruta))
-            .Where(dir => !string.IsNullOrEmpty(dir))
-            .Distinct()
-            .ToList();
+       bool todosDirectoriosCreados = true;
+        var directorios = rutasArchivos
+           .Select(ruta => System.IO.Path.GetDirectoryName(ruta))
+           .Where(dir => !string.IsNullOrEmpty(dir))
+           .Distinct()
+           .ToList();
 
-         foreach (var dir in directorios)
-        {                   
-           Directory.CreateDirectory(dir!); 
+        foreach (var dir in directorios)
+        {
+            try
+            {
+                Directory.CreateDirectory(dir!);                
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"Error: No se tiene permiso para crear el directorio '{dir}'. Detalles: {ex.Message}");
+                todosDirectoriosCreados = false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al crear el directorio '{dir}': {ex.Message}");
+                todosDirectoriosCreados = false;
+            }
         }
-           
-            
+        return todosDirectoriosCreados;
 
     }
 
