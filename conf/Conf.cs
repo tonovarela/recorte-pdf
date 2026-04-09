@@ -8,8 +8,8 @@ public class Conf
     
     public Conf()
     {
-        Env.Load();
         Console.WriteLine("Cargando configuración...");
+        Env.Load();        
         Environment = Env.GetString("ENVIRONMENT") ?? throw new InvalidOperationException("La variable de entorno 'ENVIRONMENT' no está definida.");
         bool isDevelopment = Environment.Equals("development", StringComparison.OrdinalIgnoreCase);        
         Console.WriteLine($"Entorno: {(isDevelopment ? "Desarrollo" : "Producción")}");
