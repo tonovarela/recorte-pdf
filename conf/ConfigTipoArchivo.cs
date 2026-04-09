@@ -9,7 +9,7 @@ public class ConfigTipoArchivo
     public string TextoFin { get; }
     public float MargenArriba { get; }
 
-  public Func<string, string, SearchStrategy> CrearEstrategia { get; }
+    public Func<string, string, SearchStrategy> CrearEstrategia { get; }
 
     private ConfigTipoArchivo(string textoInicio, string textoFin, float margenArriba, Func<string, string, SearchStrategy> crearEstrategia)
     {

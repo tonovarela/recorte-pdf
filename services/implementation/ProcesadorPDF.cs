@@ -46,9 +46,9 @@ public class ProcesadorPDF : IProcesadorPDF
 
             using var reader = new PdfReader(origen.Ruta);
             using var pdfDocOrigen = new PdfDocument(reader);
-            foreach (var r in recibos)
+            foreach (var recibo in recibos)
             {
-                ProcesarRecibo(pdfDocOrigen, r, _anexoDAO);
+                ProcesarRecibo(pdfDocOrigen, recibo, _anexoDAO);
             }
             //ArchivoManager.Eliminar(origen.Ruta);
 
