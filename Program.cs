@@ -13,11 +13,8 @@ public partial class Program
 
 
     public static void Main(string[] args)
-    {
-        
-
-        var services = new ServiceCollection();
-                
+    {    
+        var services = new ServiceCollection();                
         services.AddSingleton<Conf>();        
         services.AddScoped<IAnexoDAO, AnexoDAO>();
         services.AddScoped<IProcesadorPDF, ProcesadorPDF>();
