@@ -19,9 +19,6 @@ public class ProcesadorPDF : IProcesadorPDF
         _hotFolderPath = conf.HotFolderPath;
     }
 
-
-
-
     public void Ejecutar()
     {        
         var archivosEntrada = ArchivoManager.Clasificar(_hotFolderPath);
