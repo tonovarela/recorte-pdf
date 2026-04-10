@@ -22,5 +22,7 @@ recortados/*
 comprobante.pdf
 
 .env
+.env.production
+
 # OS files
 .DS_Store

@@ -90,8 +90,7 @@ public class ProcesadorPDF : IProcesadorPDF
         {
             if (anexoDAO.existe(recibo.ArchivoAnexoDTO!))
                 anexoDAO.borrar(recibo.ArchivoAnexoDTO!.Id.ToString());
-
-            Console.WriteLine($"Archivo generado: {recibo.ArchivoAnexoDTO!.RutaArchivoSystem}");
+            Console.WriteLine($"Archivo generado: {recibo.ArchivoAnexoDTO!.RutaArchivoSystem} con id: {recibo.ArchivoAnexoDTO!.Id}" );
             anexoDAO.registrar(recibo.ArchivoAnexoDTO!);
         }
         catch (Microsoft.Data.SqlClient.SqlException ex)
