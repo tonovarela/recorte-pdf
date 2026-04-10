@@ -21,6 +21,8 @@ recortados/*
 # Local input files (optional)
 comprobante.pdf
 
+publish/*
+
 .env
 .env.production
 
