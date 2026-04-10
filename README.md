@@ -85,6 +85,7 @@ pdf-recorte/
 ## Uso
 
 ```bash
+
 # Desarrollo
 dotnet run
 
@@ -93,9 +94,16 @@ dotnet build -c Release
 
 # Publicar
 dotnet publish -c Release -o publish
+
+# Copiar el .env en la carpeta publish o crearla 
+# Antes debes se ingresar los datos requeridos
+cp .env.development ./publish/.env
 ```
 
-## Extracción de Datos (Regex)
+
+
+
+## Extracción de Datos por medio de expresiones regulares.
 
 ### PLATAFORMA (SIT)
 - **Número de operación:** `Número de operación\s*([0-9\s]+)`

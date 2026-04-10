@@ -12,14 +12,17 @@ public class ProcesadorPDF : IProcesadorPDF
 
     private readonly IAnexoDAO _anexoDAO;
     private readonly string _hotFolderPath;
+    private readonly bool _isProduction;
     public ProcesadorPDF(IAnexoDAO anexoDAO, Conf conf )
     {
         _anexoDAO = anexoDAO;
         _hotFolderPath = conf.HotFolderPath;
+        _isProduction = conf.Environment == "PRODUCTION";
     }
 
     public void Ejecutar()
     {        
+        
         var archivosEntrada = ArchivoManager.Clasificar(_hotFolderPath);
         foreach (var origen in archivosEntrada.Where(a => a.Tipo == TipoArchivo.PLATAFORMA))
         {
@@ -49,10 +52,11 @@ public class ProcesadorPDF : IProcesadorPDF
             {
                 ProcesarRecibo(pdfDocOrigen, recibo, _anexoDAO);
             }
-            //ArchivoManager.Eliminar(origen.Ruta);
-
-
-
+            if (_isProduction)
+            {
+               ArchivoManager.Eliminar(origen.Ruta);    
+            }
+            
         }
     }
 
