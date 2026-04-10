@@ -1,4 +1,3 @@
-using System;
 using iText.Kernel.Pdf;
 using pdf_recorte.conf;
 using pdf_recorte.DAO.interfaces;
